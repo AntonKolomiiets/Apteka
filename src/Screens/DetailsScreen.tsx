@@ -11,7 +11,7 @@ import {
   View,
   Image,
   ActivityIndicator,
-  RefreshControl
+  RefreshControl,
 } from 'react-native';
 import {observer} from 'mobx-react-lite';
 import {useStore} from '../store/Store';
@@ -48,7 +48,7 @@ const DetailsScreen = observer(() => {
   const [isEnabled, setIsEnabled] = useState(false);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
-  const refreshing = false
+  const refreshing = false;
 
   // const debouncedSearch = useCallback(
   //   debounce((text: string) => {
@@ -166,16 +166,16 @@ const DetailsScreen = observer(() => {
           <Text style={{fontFamily: 'Montserrat-Medium', fontSize: 12}}>»</Text>
         </View>
       )}
-      {rootStore.isSearching && <ActivityIndicator/>}
+      {rootStore.isSearching && <ActivityIndicator />}
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={{paddingTop: Platform.OS === 'ios' ? 15 : 15}}
         refreshControl={
-          <RefreshControl refreshing={refreshing}
-          onRefresh={rootStore.debounceSearch}
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={rootStore.debounceSearch}
           />
-        }
-        >
+        }>
         <View>
           {rootStore.SortByPriceAcend.map(drug => (
             <DrugBox

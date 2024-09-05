@@ -16,35 +16,50 @@ export const RootStore = types
     drugs: types.array(Drugs_results),
     searchString: types.string,
     isSearching: false,
+    searchCounter: 0,
   })
-  .volatile(() => ({
+  .volatile(self => ({
     currentAbortController: null as AbortController | null, // read about it
     debouncedSearch: null as any,
   }))
   .actions(self => ({
+    countSearch() {
+      self.searchCounter++;
+    },
     clearSearchResults() {
       self.drugs.clear();
     },
     addDrugs(drugs: any) {
       this.clearSearchResults();
       self.drugs = drugs;
+      console.dir;
     },
     setIsSearch(state: boolean) {
       self.isSearching = state;
     },
     setSearchString(string: string) {
-      self.searchString = string;
-      console.log(self.searchString);
-      if (self.searchString) {
+      if (string) {
+        self.searchString = string;
+        console.log(self.searchString);
         this.debounceSearch();
       } else {
+        console.log(
+          'Search is empty. Clearing search results...',
+          self.searchString,
+        );
         this.clearSearchResults();
       }
     },
     async searchApi() {
+      const searchId = self.searchCounter + 1
+      this.countSearch()
       if (!self.searchString) {
         this.clearSearchResults();
       } else {
+        console.log(
+          `Calling debounced search ID: ${searchId} with \x1b[32m%s\x1b[0m`,
+          self.searchString,
+        );
         this.setIsSearch(true);
         if (self.currentAbortController) {
           self.currentAbortController.abort();
@@ -53,6 +68,7 @@ export const RootStore = types
         const controller = new AbortController();
         self.currentAbortController = controller;
 
+        let startTime = performance.now()
         try {
           const [anc, podorozhnyk, apteka911] = await Promise.all([
             searchAnc(self.searchString, controller.signal),
@@ -61,10 +77,14 @@ export const RootStore = types
           ]);
           const resultsArray = [anc, podorozhnyk, apteka911].flat();
           this.addDrugs(resultsArray);
+          console.log(
+            '\x1b[36m%s\x1b[0m',
+            `Found ${resultsArray.length} results`,  `Search ID: ${searchId}`,
+          );
         } catch (error) {
           if (error instanceof Error) {
             if (error.name === 'AbortError') {
-              console.log('Previous request was aborted');
+              console.log('\x1b[33m%s\x1b[0m', `Request with ID: ${searchId} was aborted`);
               this.setIsSearch(false);
             } else {
               console.error('Error occurred:', error);
@@ -73,12 +93,13 @@ export const RootStore = types
           }
         }
         this.setIsSearch(false);
+        let endTime = performance.now()
+        console.log(`apiCall ID: ${searchId} took ${Math.floor(endTime - startTime) / 1000} seconds.`)
       }
     },
     debounceSearch() {
       if (!self.debouncedSearch) {
         self.debouncedSearch = debounce(() => {
-          console.log(`Calling debounced search with ${self.searchString}`);
           this.searchApi();
         }, 300);
       }

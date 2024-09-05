@@ -173,7 +173,7 @@ const DetailsScreen = observer(() => {
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={rootStore.debounceSearch}
+            onRefresh={rootStore.searchApi}
           />
         }>
         <View>

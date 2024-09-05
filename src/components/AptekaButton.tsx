@@ -20,7 +20,6 @@ const getUri = (apteka: string): string => {
     anc: 'https://anc.ua/',
     '911': 'https://apteka911.ua/ua',
   };
-
   return uriMap[apteka];
 };
 

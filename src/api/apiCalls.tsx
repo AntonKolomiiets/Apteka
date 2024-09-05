@@ -1,14 +1,17 @@
 const cheerio = require('react-native-cheerio');
 
 interface Product {
-  id : number;
+  id: number;
   name: string;
   price: number;
   store: string;
   picture: string;
 }
 
-export const searchAnc = async (prompt: string, signal: AbortSignal): Promise<Product[]> => {
+export const searchAnc = async (
+  prompt: string,
+  signal: AbortSignal,
+): Promise<Product[]> => {
   const payload = {
     query: `${prompt}`,
     source: 5,
@@ -75,15 +78,18 @@ export const searchAnc = async (prompt: string, signal: AbortSignal): Promise<Pr
 
     return allItems;
   } catch (error) {
-    console.log('Error fetching data:', error);
+    console.log('Error fetching data in "searchAnc()":', '\x1b[31m', error);
     return [];
   }
 };
 
-export const searchPodorozhnyk = async (prompt: string, signal: AbortSignal): Promise<Product[]> => {
+export const searchPodorozhnyk = async (
+  prompt: string,
+  signal: AbortSignal,
+): Promise<Product[]> => {
   const url = `https://catalogue.l.podorozhnyk.com/api/v2/projections/search?query=${prompt}`;
   try {
-    const response = await fetch(url, { signal });
+    const response = await fetch(url, {signal});
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
@@ -102,17 +108,26 @@ export const searchPodorozhnyk = async (prompt: string, signal: AbortSignal): Pr
       store: 'podorozhnyk',
     }));
 
-    return drugs.filter((drug: Product) => drug.id && drug.name && drug.price !== undefined);
+    return drugs.filter(
+      (drug: Product) => drug.id && drug.name && drug.price !== undefined,
+    );
   } catch (error) {
-    console.log('Error fetching data:', error);
+    console.log(
+      'Error fetching data in "searchPodorozhnyk()":',
+      '\x1b[31m',
+      error,
+    );
     return [];
   }
 };
 
-export const searchApteka911 = async (prompt: string, signal: AbortSignal): Promise<Product[]> => {
+export const searchApteka911 = async (
+  prompt: string,
+  signal: AbortSignal,
+): Promise<Product[]> => {
   const url = `https://apteka911.ua/ua/shop/search?query=${prompt}`;
   try {
-    const response = await fetch(url, { signal });
+    const response = await fetch(url, {signal});
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
@@ -125,20 +140,38 @@ export const searchApteka911 = async (prompt: string, signal: AbortSignal): Prom
         const productBlock = $(element);
         const name = productBlock.find('.prod__header a').text().trim();
         const priceText = productBlock.find('.price-new').text().trim();
-        const price = parseFloat(priceText.replace(' грн.', '').replace(',', '.')) || 0;
-        const picture = productBlock.find('.b-prod__thumb meta[itemprop="contentUrl"]').attr('content') || '';
+        const price =
+          parseFloat(priceText.replace(' грн.', '').replace(',', '.')) || 0;
+        const picture =
+          productBlock
+            .find('.b-prod__thumb meta[itemprop="contentUrl"]')
+            .attr('content') || '';
         const productUrl = productBlock.find('.prod__header a').attr('href');
         const idMatch = productUrl ? productUrl.match(/-p(\d+)/) : null;
-        const id = idMatch ? parseInt(idMatch[1], 10) : Date.now() + Math.random();
+        const id = idMatch
+          ? parseInt(idMatch[1], 10)
+          : Date.now() + Math.random();
 
-        return { id, name, price, picture, store: '911' };
+        return {id, name, price, picture, store: '911'};
       })
       .get()
-      .filter((product: Product) => product.id && product.name && product.price !== undefined); // Filter out invalid items
+      .filter(
+        (product: Product) =>
+          product.id && product.name && product.price !== undefined,
+      ); // Filter out invalid items
 
     return products;
   } catch (error) {
-    console.log('Error fetching data:', error);
+    console.log(
+      'Error fetching data in "searchApteka911()":',
+      '\x1b[31m',
+      error,
+    );
     return [];
   }
 };
+
+// const pullItem = ({id, name, price, picture, store: '911'}: Product) => {
+//   let arrayOfObjects: Product[] = []
+//   return arrayOfObjects
+// }

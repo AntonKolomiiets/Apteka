@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import {
   View,
   SafeAreaView,
@@ -20,8 +19,6 @@ import ScoreView from "@/components/ScoreView";
 const Index = observer(() => {
   const store = useStore();
   const refreshing = false;
-
-  const win = store.isWin;
 
   const handleAttemptIncrement = () => {
     store.currentCharacter?.incrementAttempt();
